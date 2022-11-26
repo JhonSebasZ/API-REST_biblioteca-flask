@@ -36,12 +36,6 @@ def crearLibro():
         api = ApiResponse(mensage='El autor del libro dede de ser un str')
         return api.toDic()
     
-    # validacion palabras claves
-    if data.get('palabras_claves') is not None:
-        if not isinstance(data.get('palabras_claves'), str):
-            api = ApiResponse(mensage='Las palabras claves deden de ser un str')
-            return api.toDic() 
-    
     # validacion categoria
     if data.get('categoria') is None:
         api = ApiResponse(mensage='La categoria del libro es obligatio')
@@ -117,13 +111,7 @@ def actualizarLibro(id):
     if not isinstance(data.get('autor'), str):
         api = ApiResponse(mensage='El autor del libro dede de ser un str')
         return api.toDic()
-    
-    # validacion palabras claves
-    if data.get('palabras_claves') is not None:
-        if not isinstance(data.get('palabras_claves'), str):
-            api = ApiResponse(mensage='Las palabras claves deden de ser un str')
-            return api.toDic() 
-    
+
     # validacion categoria
     if data.get('categoria') is None:
         api = ApiResponse(mensage='La categoria del libro es obligatio')

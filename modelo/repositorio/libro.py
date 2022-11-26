@@ -3,7 +3,7 @@ from modelo.conexion import execute, commit
 
 class RepositorioLibro:
     def crear(self, libro:Libro) -> None:
-        palabras_claves = libro.palabras_claves if libro.palabras_claves != None else 'NULL'
+        palabras_claves = ','.join(libro.palabras_claves) if libro.palabras_claves != None else 'NULL'
         sql = f"""
                 INSERT INTO libro (id_libro, titulo, autor, palabras_claves, categoria, valor)
                 VALUES ({libro.id_libro},'{libro.titulo}', '{libro.autor}', '{palabras_claves}', '{libro.categoria}', {libro.valor})
@@ -19,10 +19,11 @@ class RepositorioLibro:
         
         libros = []
         for resultado in resultados:
+            palabras_claves = resultado[3].split(',')
             libros.append(
                 Libro(
                     id_libro=resultado[0], titulo=resultado[1],
-                    autor=resultado[2], palabras_claves=resultado[3],
+                    autor=resultado[2], palabras_claves=palabras_claves,
                     categoria=resultado[4], valor=resultado[5]
                 )
             )
@@ -39,9 +40,10 @@ class RepositorioLibro:
         
         libros = []
         for resultado in resultados:
+            palabras_claves = resultado[3].split(',')
             libros.append(
                 Libro(id_libro=resultado[0], titulo=resultado[1],
-                    autor=resultado[2], palabras_claves=resultado[3],
+                    autor=resultado[2], palabras_claves=palabras_claves,
                     categoria=resultado[4], valor=resultado[5])
             )
         return libros
