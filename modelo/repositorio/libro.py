@@ -5,17 +5,33 @@ class RepositorioLibro:
     def crear(self, libro:Libro) -> None:
         palabras_claves = libro.palabras_claves if libro.palabras_claves != None else 'NULL'
         sql = f"""
-                INSERT INTO libro (titulo, autor, palabras_claves, categoria, unidades, valor)
-                VALUES ('{libro.titulo}', '{libro.autor}', '{palabras_claves}', '{libro.categoria}', {libro.unidades}, {libro.valor})
+                INSERT INTO libro (id_libro, titulo, autor, palabras_claves, categoria, valor)
+                VALUES ({libro.id_libro},'{libro.titulo}', '{libro.autor}', '{palabras_claves}', '{libro.categoria}', {libro.valor})
             """
         cursor = execute(sql)
         cursor.close()
         commit()
     
-    def buscarLibroTitulo(self, parametro:str, busqueda:str) -> list:
+    def mostrarLibros(self) -> list:
+        sql = "SELECT * FROM libro"
+        cursor = execute(sql)
+        resultados = cursor.fetchall()
+        
+        libros = []
+        for resultado in resultados:
+            libros.append(
+                Libro(
+                    id_libro=resultado[0], titulo=resultado[1],
+                    autor=resultado[2], palabras_claves=resultado[3],
+                    categoria=resultado[4], valor=resultado[5]
+                )
+            )
+        return libros
+    
+    def buscarLibro(self, parametro:str, busqueda:str) -> list:
         sql = f"""
                 SELECT * FROM libro 
-                WHERE '{parametro}' = '{busqueda}'
+                WHERE {parametro} = '{busqueda}'
             """
         cursor = execute(sql)
         resultados = cursor.fetchall()
@@ -26,8 +42,7 @@ class RepositorioLibro:
             libros.append(
                 Libro(id_libro=resultado[0], titulo=resultado[1],
                     autor=resultado[2], palabras_claves=resultado[3],
-                    categoria=resultado[4], unidades=resultado[5],
-                    valor=resultado[6])
+                    categoria=resultado[4], valor=resultado[5])
             )
         return libros
     
@@ -38,7 +53,6 @@ class RepositorioLibro:
                     autor = '{libro.autor}',
                     palabras_claves = '{libro.palabras_claves}',
                     categoria = '{libro.categoria}',
-                    unidades = '{libro.unidades}',
                     valor = '{libro.valor}'
                 WHERE id_libro = {libro.id_libro}
             """
