@@ -11,7 +11,7 @@ CREATE TABLE Usuario(
 );
 
 CREATE TABLE Libro(
-	id_libro INT AUTO_INCREMENT,
+	id_libro INT NOT NULL,
 	titulo VARCHAR(50) NOT NULL,
 	autor VARCHAR(50) NOT NULL,
 	palabras_claves VARCHAR(100),

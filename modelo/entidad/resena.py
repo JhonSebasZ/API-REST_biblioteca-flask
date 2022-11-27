@@ -7,3 +7,12 @@ class Resena:
         self.calificacion = calificacion
         self.id_usuario = id_usuraio
         self.id_libro = id_libro
+        
+    def toDict(self):
+        return {
+            'comentario': self.comentario,
+            'fecha': self.fecha,
+            'calificacion': self.calificacion,
+            'id_usuario': self.id_usuario,
+            'id_libro': self.id_libro
+        }
