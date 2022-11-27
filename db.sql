@@ -33,7 +33,7 @@ CREATE TABLE Resena(
     id_resena INT AUTO_INCREMENT,
 	fecha DATETIME NOT NULL,
     comentario VARCHAR(500) NOT NULL,
-    calificacio INT NOT NULL,
+    calificacion INT NOT NULL,
     id_usuario INT NOT NULL,
     id_libro INT NOT NULL,
     CONSTRAINT pk_id_resena PRIMARY KEY(id_resena),

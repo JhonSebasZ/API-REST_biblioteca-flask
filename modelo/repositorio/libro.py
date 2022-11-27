@@ -1,4 +1,5 @@
 from modelo.entidad.libro import Libro
+from modelo.entidad.resena import Resena
 from modelo.conexion import execute, commit
 
 class RepositorioLibro:
@@ -15,16 +16,35 @@ class RepositorioLibro:
     def mostrarLibros(self) -> list:
         sql = "SELECT * FROM libro"
         cursor = execute(sql)
-        resultados = cursor.fetchall()
+        resLibros = cursor.fetchall()
+        cursor.close()
+        
+        sql = "SELECT * FROM resena"
+        cursor = execute(sql)
+        resResenas = cursor.fetchall()
+        cursor.close()
+        
         
         libros = []
-        for resultado in resultados:
-            palabras_claves = resultado[3].split(',')
+        for resL in resLibros:
+            resenas = []
+            for resR in resResenas:
+                if resL[0] == resR[4]:
+                    resenas.append(
+                        Resena(
+                            fecha=resR[0],
+                            comentario=resR[1],
+                            calificacion=resR[2],
+                            id_usuraio=resR[3],
+                        ).toDict()
+                    )
+            palabras_claves = resL[3].split(',')
+                        
             libros.append(
                 Libro(
-                    id_libro=resultado[0], titulo=resultado[1],
-                    autor=resultado[2], palabras_claves=palabras_claves,
-                    categoria=resultado[4], valor=resultado[5]
+                    id_libro=resL[0], titulo=resL[1],
+                    autor=resL[2], palabras_claves=palabras_claves,
+                    categoria=resL[4], valor=resL[5], resenas=resenas
                 )
             )
         return libros
