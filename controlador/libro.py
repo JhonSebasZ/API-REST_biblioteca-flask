@@ -4,21 +4,13 @@ from modelo.repositorio.libro import RepositorioLibro
 from controlador.response.api import ApiResponse
 from flask import request
 
-repositorio = RepositorioLibro()
+repo = RepositorioLibro()
 
 @app.route('/biblioteca/libros', methods=['POST'])
 def crearLibro():
     status = 400
     # data = request.json
     data = request.get_json(force=True)
-    
-    #  validadion id_libro
-    if data.get('id_libro') is None:
-        api = ApiResponse(mensaje='El id del libro es obligatorio')
-        return api.toDic()
-    if not isinstance(data.get('id_libro'), int):
-        api = ApiResponse(mensaje='El id del libro dede de ser un int')
-        return api.toDic()
     
     # validacion titulo
     if data.get('titulo') is None:
@@ -54,15 +46,16 @@ def crearLibro():
     
     try:
         libro = Libro(
-            id_libro=data.get('id_libro'),
             titulo=data.get('titulo'),
             autor=data.get('autor'),
             palabras_claves=data.get('palabras_claves'),
             categoria=data.get('categoria'),
-            valor=data.get('valor')  
+            valor=data.get('valor'),
+            imagen=data.get('imagen'),
+            descripcion=data.get('descripcion')
         ) 
     
-        repositorio.crear(libro)
+        repo.crear(libro)
         api = ApiResponse(data=True)
         status = 201
     except Exception as ex:
@@ -73,9 +66,8 @@ def crearLibro():
 @app.route('/biblioteca/libros', methods=['GET'])
 def mostrarLibros():
     try:
-        data = repositorio.mostrarLibros()
-        libros = [libro.toDic() for libro in data]
-        api = ApiResponse(data=libros)
+        data = repo.mostrarLibros()
+        api = ApiResponse(data=data)
         return api.toDic(), 200
     except Exception as ex:
         api = ApiResponse(mensaje=str(ex))
@@ -84,7 +76,7 @@ def mostrarLibros():
 @app.route('/biblioteca/libros/<parametro>/<busqueda>', methods=['GET'])
 def buscarLibros(parametro, busqueda):
     try:
-        data = repositorio.buscarLibro(parametro=parametro, busqueda=busqueda)
+        data = repo.buscarLibro(parametro=parametro, busqueda=busqueda)
         libros = [libro.toDic() for libro in data]
         api = ApiResponse(data=libros)
         return api.toDic(), 200
@@ -137,7 +129,7 @@ def actualizarLibro(id):
             categoria=data.get('categoria'),
             valor=data.get('valor') 
         )
-        repositorio.actualizar(libro=libro)
+        repo.actualizar(libro=libro)
         api = ApiResponse(data=True)
         return api.toDic(), 200
     except Exception as ex:
@@ -147,7 +139,7 @@ def actualizarLibro(id):
 @app.route('/biblioteca/libros/eliminar/<id>', methods=['DELETE'])
 def eliminarLibro(id):
     try:
-        repositorio.eliminar(id)
+        repo.eliminar(id)
         api = ApiResponse(data=True)
         return api.toDic(), 200
     except Exception as ex:

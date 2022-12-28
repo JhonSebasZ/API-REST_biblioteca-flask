@@ -6,47 +6,27 @@ class RepositorioLibro:
     def crear(self, libro:Libro) -> None:
         palabras_claves = ','.join(libro.palabras_claves) if libro.palabras_claves != None else 'NULL'
         sql = f"""
-                INSERT INTO libro (id_libro, titulo, autor, palabras_claves, categoria, valor)
-                VALUES ({libro.id_libro},'{libro.titulo}', '{libro.autor}', '{palabras_claves}', '{libro.categoria}', {libro.valor})
+                INSERT INTO libro (titulo, autor, palabras_claves, categoria, valor, imagen, descripcion)
+                VALUES ('{libro.titulo}', '{libro.autor}', '{palabras_claves}', '{libro.categoria}', {libro.valor}, '{libro.imagen}', '{libro.descripcion}')
             """
         cursor = execute(sql)
         cursor.close()
         commit()
     
     def mostrarLibros(self) -> list:
-        sql = "SELECT * FROM libro"
+        sql = "SELECT id_libro, titulo, imagen, descripcion FROM libro"
         cursor = execute(sql)
         resLibros = cursor.fetchall()
         cursor.close()
         
-        sql = "SELECT * FROM resena"
-        cursor = execute(sql)
-        resResenas = cursor.fetchall()
-        cursor.close()
-        
-        
         libros = []
-        for resL in resLibros:
-            resenas = []
-            for resR in resResenas:
-                if resL[0] == resR[4]:
-                    resenas.append(
-                        Resena(
-                            fecha=resR[0],
-                            comentario=resR[1],
-                            calificacion=resR[2],
-                            id_usuraio=resR[3],
-                        ).toDict()
-                    )
-            palabras_claves = resL[3].split(',')
-                        
-            libros.append(
-                Libro(
-                    id_libro=resL[0], titulo=resL[1],
-                    autor=resL[2], palabras_claves=palabras_claves,
-                    categoria=resL[4], valor=resL[5], resenas=resenas
-                )
-            )
+        for libro in resLibros:
+            libros.append({
+                'id_libro': libro[0],
+                'titulo': libro[1],
+                'imagen': libro[2],
+                'descripcion': libro[3]
+            })
         return libros
     
     def buscarLibro(self, parametro:str, busqueda:str) -> list:
@@ -55,16 +35,28 @@ class RepositorioLibro:
                 WHERE {parametro} = '{busqueda}'
             """
         cursor = execute(sql)
-        resultados = cursor.fetchall()
+        librosRes = cursor.fetchall()
         cursor.close()
         
         libros = []
-        for resultado in resultados:
-            palabras_claves = resultado[3].split(',')
+        for libro in librosRes:
+            resenas = list()
+            sql = f"""
+                SELECT * FROM resena 
+                WHERE id_libro = '{libro[0]}'
+            """
+            cursor = execute(sql)
+            resenasRes = cursor.fetchall()
+            cursor.close()
+            for res in resenasRes:
+                resenas.append(Resena(comentario=res[1], calificacion=res[2], fecha=res[0]).toDict())
+                
+            palabras_claves = libro[3].split(',')
             libros.append(
-                Libro(id_libro=resultado[0], titulo=resultado[1],
-                    autor=resultado[2], palabras_claves=palabras_claves,
-                    categoria=resultado[4], valor=resultado[5])
+                Libro(id_libro=libro[0], titulo=libro[1],
+                    autor=libro[2], palabras_claves=palabras_claves,
+                    categoria=libro[4], valor=libro[5], imagen=libro[6], 
+                    descripcion=libro[7], resenas=resenas)
             )
         return libros
     
@@ -75,7 +67,9 @@ class RepositorioLibro:
                     autor = '{libro.autor}',
                     palabras_claves = '{libro.palabras_claves}',
                     categoria = '{libro.categoria}',
-                    valor = '{libro.valor}'
+                    valor = '{libro.valor}',
+                    imagen= '{libro.imagen}',
+                    descripcion = '{libro.descripcion}'
                 WHERE id_libro = {libro.id_libro}
             """
         cursor = execute(sql)

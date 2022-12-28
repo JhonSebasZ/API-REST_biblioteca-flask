@@ -1,5 +1,12 @@
 class Articulo:
-    def __init__(self, cantidad:int, valor_articulo:float, id_libro:int) -> None:
+    def __init__(self, cantidad:int, id_libro=None, libro=None) -> None:
         self.cantidad = cantidad
-        self.vaor_articulo = valor_articulo
         self.id_libro = id_libro
+        self.libro = libro
+        
+    def toDic(self):
+        return {
+            'cantidad': self.cantidad,
+            'id_libro': self.id_libro,
+            'libro': self.libro
+        }

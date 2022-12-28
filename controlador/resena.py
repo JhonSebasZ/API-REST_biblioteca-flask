@@ -15,7 +15,6 @@ def crearResena():
         resena = Resena(
             comentario=data.get('comentario'),
             calificacion=data.get('calificacion'),
-            id_usuraio=data.get('id_usuario'),
             id_libro=data.get('id_libro')
         )
     
@@ -31,10 +30,9 @@ def eliminarResena():
     estado = 200
     data = request.json
     id_libro = data.get('id_libro')
-    id_usuario = data.get('id_usuario')
     fecha = data.get('fecha')
     try:
-        repo.eliminarResena(id_libro=id_libro, id_usuario=id_usuario, fecha=fecha)
+        repo.eliminarResena(id_libro=id_libro, fecha=fecha)
         api = ApiResponse()
     except Exception as ex:
         estado = 400
